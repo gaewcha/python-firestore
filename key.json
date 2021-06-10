@@ -1,0 +1,2 @@
+* 1.Get this file from 'Project Setting' --> 'Service Account' ---> 'Firebase Admin SDK' ---> 'Python' *
+* 2. Select 'Generate new private key' ---> download and rename to 'key.json'*
