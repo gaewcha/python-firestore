@@ -21,12 +21,9 @@ def create():
         curl -X POST -H "Content-Type: application/json" -d "{ \"name\": \"Alice\", \"age\":\"20\" }" http://localhost:5000/add
         curl -X POST -H "Content-Type: application/json" -d "{ \"name\": \"Bob\", \"age\":\"25\" }" http://localhost:5000/add
     """
-    try:
-        name = request.json['name']
-        userAccount_ref.document(name).set(request.json)
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        return f"An Error Occured: {e}"
+    name = request.json['name']
+    userAccount_ref.document(name).set(request.json)
+    return jsonify({"success": True})
 
 
 
@@ -41,20 +38,18 @@ def read():
         (With Query String(name) = list by username)
         curl  http://localhost:5000/list?name=Alice
     """
-    try:
-        # If Check if parameter 'name' was passed to URL query
-        username = request.args.get('name')
-        if username:
-            user = userAccount_ref.document(username).get()
-            return jsonify(user.to_dict())
 
-        # If no parameter was passed  ---> loop though user list and return all records
-        else:
-            all_users = [doc.to_dict() for doc in userAccount_ref.stream()]
-            return jsonify(all_users), 200
+    # If Check if parameter 'name' was passed to URL query
+    username = request.args.get('name')
+    if username:
+        user = userAccount_ref.document(username).get()
+        return jsonify(user.to_dict())
 
-    except Exception as e:
-        return f"An Error Occured: {e}"
+    # If no parameter was passed  ---> loop though user list and return all records
+    else:
+        all_users = [doc.to_dict() for doc in userAccount_ref.stream()]
+        return jsonify(all_users), 200
+
 
 
 
