@@ -5,14 +5,48 @@ import os
 from flask import Flask, request, jsonify
 from firebase_admin import credentials, firestore, initialize_app
 
+# 1. Import additional 'storage'
+from firebase_admin import storage
+
 # Initialize Flask app
 app = Flask(__name__)
 
 # Initialize Firestore DB
 cred = credentials.Certificate('./key.json')
-default_app = initialize_app(cred)
+
+# 2. Initialized firebase app with 'storage' destination specified (omit 'gs://')
+default_app = initialize_app(cred, {
+    'storageBucket': '[your own storage name].appspot.com'
+})
+
+
+# 3. Create reference to your storage bucket
+ds = storage.bucket()
+
+
+
 db = firestore.client()
 userAccount_ref = db.collection('userAccount')
+
+
+
+#4. Try create endpoint for uploading images  (http://localhost:5000/uploadImage)
+@app.route('/uploadImage', methods=['GET'])
+def uploadImage():
+    # 4.1 Specify name of the uploaded file
+    uploadContent = ds.blob('image1.png')
+
+    # 4.2 Locate the file
+    uploadContent.upload_from_filename(os.path.basename('D:\Work-NECTEC\coding\python-firestore\cat.png'))
+
+    # 4.3 By default, image is not public. In order to get publicly accessible url, we need to specified '.make_public()'
+    uploadContent.make_public()
+
+    # 4.4 Return URL for user to access his/her image
+    return jsonify({"accessible_url": uploadContent.public_url})
+
+
+
 
 @app.route('/add', methods=['POST'])
 def create():
